@@ -1,10 +1,5 @@
 <?php
 
-
-function readFromFile() {
-    return file_get_contents('puzzle.txt');
-}
-
 $listRegion = array(
     'FBBFBBBRLR',
     'BFFBBFFLLL',
