@@ -85,83 +85,57 @@ function part1()
     return bindec($gamma) * bindec($epsilon);
 }
 
-echo part1();
+echo 'Part1: ' . part1() . "\n";
 
-
-//PART2 IS NOT THE GOOD ANSWER
 function part2()
 {
-    $puzzle = readFromFile();
-    $oxygen = oxygenGenerator(readFromFile(), 0);
-    $newPuzzle = [];
-    foreach ($oxygen as $opt) {
-        if(isset($puzzle[$opt])) {
-            array_push($newPuzzle, $puzzle[$opt]);
-        }
-    }
-    for ($i=1;$i<=11; $i++) {
-        $oxygen = oxygenGenerator($newPuzzle, $i);
+    $puzzleOxy = readFromFile();
+    $puzzleScrub = readFromFile();
 
-        if(count($oxygen) === 1) {
-            var_dump($newPuzzle);
-            break;
+    $countScrub = 0;
+    $countOxy = 0;
+
+    $stopOxy = false;
+    while (!$stopOxy) {
+        $puzzleOxy = oxygenGenerator($puzzleOxy, $countOxy);
+        if(count($puzzleOxy) === 1) {
+            $stopOxy = true;
         }
-        foreach ($oxygen as $opt) {
-            unset($newPuzzle);
-            $newPuzzle = [];
-            array_push($newPuzzle, $puzzle[$opt]);
-        }
+        $countOxy++;
     }
 
-
-    $scrubber = scrubberGenerator(readFromFile(), 0);
-    $scrubberPuzzle = [];
-
-    foreach ($scrubber as $opt) {
-        if(isset($puzzle[$opt])) {
-            array_push($scrubberPuzzle, $puzzle[$opt]);
+    $stopScrub = false;
+    while (!$stopScrub) {
+        $puzzleScrub = scrubberGenerator($puzzleScrub, $countScrub);
+        if(count($puzzleScrub) === 1) {
+            $stopScrub = true;
         }
+        $countScrub++;
     }
-    for ($i=1;$i<=11; $i++) {
-        $scrubber = oxygenGenerator($scrubberPuzzle, $i);
-
-        if(count($scrubber) === 1) {
-            var_dump($scrubberPuzzle);
-            break;
-        }
-        foreach ($scrubber as $opt) {
-            unset($scrubberPuzzle);
-            $scrubberPuzzle = [];
-            array_push($scrubberPuzzle, $puzzle[$opt]);
-        }
-    }
-    var_dump(bindec($newPuzzle[0])*bindec($scrubberPuzzle[0]));
+    return bindec($puzzleOxy[0]) *  bindec($puzzleScrub[0]);
 }
 
 function oxygenGenerator(array $puzzle, int $index): array
 {
-    $bitOne = [];
-    $bitZero = [];
-    foreach ($puzzle as $key1 => $bit) {
-        $explodePuzzle = str_split($bit);
-        foreach ($explodePuzzle as $key => $value) {
-            if ($key === $index) {
-                if ($value === "1") {
-                    $bitOne[] = $key1;
-                } else {
-                    $bitZero[] = $key1;
-                }
-            }
-        }
-    }
-    if (count($bitZero) > count($bitOne)) {
-        return $bitZero;
+    $bits = generateArray($puzzle, $index);
+    if (count($bits[0]) > count($bits[1])) {
+        return $bits[0];
     }
 
-    return $bitOne;
+    return $bits[1];
 }
 
 function scrubberGenerator(array $puzzle, int $index): array
+{
+    $bits = generateArray($puzzle, $index);
+    if (count($bits[0]) > count($bits[1])) {
+        return $bits[1];
+    }
+
+    return $bits[0];
+}
+
+function generateArray(array $puzzle, int $index): array
 {
     $bitOne = [];
     $bitZero = [];
@@ -170,18 +144,18 @@ function scrubberGenerator(array $puzzle, int $index): array
         foreach ($explodePuzzle as $key => $value) {
             if ($key === $index) {
                 if ($value === "1") {
-                    $bitOne[] = $key1;
+                    $bitOne[] = $bit;
                 } else {
-                    $bitZero[] = $key1;
+                    $bitZero[] = $bit;
                 }
             }
         }
     }
-    if (count($bitZero) > count($bitOne)) {
-        return $bitOne;
-    }
 
-    return $bitZero;
+    return [
+        0 => $bitZero,
+        1 => $bitOne,
+    ];
 }
 
-echo part2();
+echo 'Part2: ' . part2();
